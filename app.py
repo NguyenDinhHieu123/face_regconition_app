@@ -7,7 +7,7 @@ import os
 KNOWN_FACES_DIR = "known_faces"
 UNKNOWN_IMAGES_DIR = "unknown_images"
 OUTPUT_IMAGES_DIR = "output_images"
-MODEL = "hog" 
+MODEL = "hog" # có thể sử dụng cnn để tăng hiệu quả nhưng sẽ mất thời gian hơn và yêu cầu gpu
 # Hàm nạp dữ liệu ảnh mẫu và mã hóa khuôn mặt
 def load_known_faces(known_faces_dir):
     print(f"Đang tải dữ liệu mẫu...")
