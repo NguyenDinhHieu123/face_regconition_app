@@ -7,10 +7,10 @@ import os
 KNOWN_FACES_DIR = "known_faces"
 UNKNOWN_IMAGES_DIR = "unknown_images"
 OUTPUT_IMAGES_DIR = "output_images"
-TOLERANCE = 0.6  # Ngưỡng (thấp hơn => nghiêm ngặt hơn). 0.6 là tiêu chuẩn tốt.
+TOLERANCE = 0.6 
 FRAME_THICKNESS = 2
 FONT_THICKNESS = 2
-MODEL = "hog"  # "hog" (nhanh hơn, ít chính xác hơn) hoặc "cnn" (chậm hơn, chính xác hơn, cần GPU)
+MODEL = "cnn"  # "hog" (nhanh hơn, ít chính xác hơn) hoặc "cnn" (chậm hơn, chính xác hơn, cần GPU)
 
 # --- Hàm tải và mã hóa khuôn mặt đã biết ---
 def load_known_faces(known_faces_dir):
@@ -19,11 +19,9 @@ def load_known_faces(known_faces_dir):
     known_face_names = []
 
     for name in os.listdir(known_faces_dir):
-        # Đảm bảo đây là thư mục của một người (ví dụ: obama/)
-        # hoặc file ảnh trực tiếp (obama.jpg)
         if os.path.isfile(os.path.join(known_faces_dir, name)) and name.lower().endswith(('.png', '.jpg', '.jpeg')):
             image_path = os.path.join(known_faces_dir, name)
-            person_name = os.path.splitext(name)[0] # Lấy tên từ tên file (ví dụ: obama từ obama.jpg)
+            person_name = os.path.splitext(name)[0] # Lấy tên từ tên file (ví dụ: hieu từ hieu.jpg)
 
             print(f"  - Đang xử lý: {person_name}...")
             image = face_recognition.load_image_file(image_path)
@@ -39,8 +37,6 @@ def load_known_faces(known_faces_dir):
             known_face_encodings.append(encoding)
             known_face_names.append(person_name)
         elif os.path.isdir(os.path.join(known_faces_dir, name)):
-            # Nếu bạn có các thư mục con cho mỗi người (ví dụ: known_faces/obama/pic1.jpg)
-            # Điều này phức tạp hơn một chút, chúng ta sẽ giữ cho ví dụ này đơn giản
             print(f"  - Bỏ qua thư mục con '{name}'. Chỉ xử lý file ảnh trực tiếp.")
             pass
     
@@ -48,12 +44,11 @@ def load_known_faces(known_faces_dir):
     return known_face_encodings, known_face_names
 
 # --- Hàm nhận diện khuôn mặt trong ảnh chưa biết ---
-# --- Hàm nhận diện khuôn mặt trong ảnh chưa biết ---
 def recognize_faces_in_image(image_path, known_face_encodings, known_face_names):
     print(f"\nĐang xử lý ảnh chưa biết: {image_path}...")
     
 
-    # Tải ảnh bằng face_recognition (dùng Pillow) để xử lý (ảnh RGB)
+    # Tải ảnh bằng face_recognition  để xử lý (ảnh RGB)
     rgb_image = face_recognition.load_image_file(image_path)
     
     # Tải ảnh bằng OpenCV (BGR) CHỈ để dùng cho việc vẽ và lưu
@@ -64,13 +59,11 @@ def recognize_faces_in_image(image_path, known_face_encodings, known_face_names)
     
 
     # Tìm tất cả khuôn mặt và encoding của chúng trong ảnh RGB
-    # (Giờ đây chúng ta sử dụng rgb_image, không phải ảnh từ cv2)
     face_locations = face_recognition.face_locations(rgb_image, model=MODEL)
     face_encodings = face_recognition.face_encodings(rgb_image, known_face_locations=face_locations)
 
     print(f"  Tìm thấy {len(face_locations)} khuôn mặt trong ảnh này.")
 
-    # Lặp qua từng khuôn mặt tìm thấy
     for face_location, face_encoding in zip(face_locations, face_encodings):
         
         # So sánh khuôn mặt chưa biết với danh sách các khuôn mặt đã biết
